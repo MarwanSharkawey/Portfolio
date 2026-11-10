@@ -1,0 +1,702 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Marwan Sharkawey</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a spec-sheet rail on the left, content on the right. Each section is printed in
+   by a swarm of nanobots that merge into one lead unit, form the name, then sweep a scan line down the page. */
+:root{
+  --bg:#EDF0F3; --surface:#F7F9FB; --line:#C9D1DA; --fg:#101923; --muted:#53647A;
+  --accent:#B04A06; --bot:#2D6A9E;
+  --font-display:"Bricolage Grotesque","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1118; --surface:#111B26; --line:#223244; --fg:#E7EDF3; --muted:#92A1B3;
+    --accent:#FFA21F; --bot:#7DB6E8; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1118; --surface:#111B26; --line:#223244; --fg:#E7EDF3; --muted:#92A1B3;
+  --accent:#FFA21F; --bot:#7DB6E8; color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font:400 16px/1.6 var(--font-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto}
+
+/* canvas + HUD */
+#swarm{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
+.hud{
+  position:fixed; z-index:30;
+  left:max(16px,env(safe-area-inset-left,0px));
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  width:min(270px,calc(100vw - 32px));
+  padding:10px 12px 12px;
+  background:var(--surface);
+  background:color-mix(in srgb,var(--surface) 90%,transparent);
+  border:1px solid var(--line);
+  font:400 11.5px/1.55 var(--font-mono); color:var(--fg);
+}
+.hud-top{display:flex;justify-content:space-between;gap:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.06em}
+.hud-top .dot{display:inline-block;width:7px;height:7px;margin-right:7px;background:var(--accent);animation:blink 1.4s steps(2,jump-none) infinite}
+@keyframes blink{50%{opacity:.25}}
+.hud-row{display:flex;justify-content:space-between;gap:12px}
+.hud-row span{color:var(--muted)}
+.hud-row b{font-weight:500;text-align:right;min-width:0}
+.bar{height:3px;background:var(--line);margin:6px 0 6px}
+.bar i{display:block;height:100%;width:0;background:var(--accent)}
+.log{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);color:var(--muted);min-height:4.6em;font-size:10.5px;line-height:1.45}
+.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.hud button{
+  width:100%;font:500 11.5px var(--font-mono);letter-spacing:.06em;
+  padding:8px 10px;background:transparent;color:var(--fg);border:1px solid var(--fg);border-radius:3px;cursor:pointer;
+}
+#h-replay{grid-column:1 / -1}
+.hud button:hover{background:var(--fg);color:var(--bg)}
+.hud button:focus-visible,.links a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* hero */
+.hero{padding-block:clamp(40px,9vw,96px) 44px}
+.kicker{font:500 12px/1 var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 22px}
+.name{font:800 clamp(3.4rem,13vw,4.9rem)/.88 var(--font-display);letter-spacing:-.035em;margin:0 0 28px}
+/* .name > span{display:block} */
+.roles{margin:0;font:500 clamp(1rem,2.3vw,1.3rem)/1.5 var(--font-body);display:flex;flex-wrap:wrap;gap:2px 14px}
+.roles i{font-style:normal;color:var(--accent)}
+
+/* sections */
+.sec{display:grid;grid-template-columns:190px minmax(0,1fr);gap:clamp(20px,4vw,48px);padding-block:44px;border-top:1px solid var(--line)}
+.rail{align-self:start;position:sticky;top:24px;font:500 12px/1.5 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.st{display:block;margin-top:6px;letter-spacing:0;text-transform:none;font-weight:400}
+.st::before{content:"";display:inline-block;width:6px;height:6px;margin-right:8px;background:var(--line)}
+.is-building .st{color:var(--accent)}
+.is-building .st::before{background:var(--accent)}
+.is-built .st{color:var(--fg)}
+.is-built .st::before{background:var(--bot)}
+.body{min-width:0}
+.js [data-piece].q{visibility:hidden}
+.js .ch{visibility:hidden}
+.js .ch.on{visibility:visible}
+h2{font:700 clamp(1.55rem,3.2vw,2.2rem)/1.1 var(--font-display);letter-spacing:-.02em;margin:0 0 26px}
+h3{margin:0}
+
+.profile{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,4vw,48px)}
+.profile > *{min-width:0}
+.lede{font:400 clamp(1.1rem,1.9vw,1.3rem)/1.55 var(--font-body);margin:0 0 24px;max-width:60ch}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{font:500 13px/1 var(--font-mono);letter-spacing:.04em;padding:11px 14px;border:1px solid var(--fg);border-radius:3px;text-decoration:none}
+.links a:hover{background:var(--fg);color:var(--bg)}
+dl{margin:0;display:grid;gap:14px}
+dt{font:500 11px/1.2 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+dd{margin:0}
+
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:30px 36px}
+.group h3{font:500 12px/1.3 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.chips li{font:400 12.5px/1 var(--font-mono);padding:7px 9px;border:1px solid var(--line);background:var(--surface);border-radius:3px}
+
+.entry{display:grid;gap:10px;padding-block:24px;border-top:1px solid var(--line)}
+.entry:first-of-type{border-top:0;padding-top:0}
+.entry h3{font:700 clamp(1.15rem,2.2vw,1.45rem)/1.2 var(--font-display);letter-spacing:-.01em}
+.meta{font:400 12px/1.4 var(--font-mono);letter-spacing:.04em;color:var(--muted);margin:0}
+ul.pts{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:7px;max-width:68ch}
+ul.pts li{position:relative;padding-left:20px}
+ul.pts li::before{content:"–";position:absolute;left:0;color:var(--accent);font-family:var(--font-mono)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:30px 40px}
+.plain{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.plain li{padding-bottom:8px;border-bottom:1px solid var(--line)}
+.plain li:last-child{border-bottom:0}
+
+footer{border-top:1px solid var(--line);padding-block:36px 150px;font:400 12px/1.6 var(--font-mono);color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+
+@media (max-width:760px){
+  .sec{grid-template-columns:minmax(0,1fr);gap:18px;padding-block:32px}
+  .rail{position:static;display:flex;gap:14px;align-items:baseline}
+  .st{margin-top:0}
+  .profile{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:600px){ .log{display:none} }
+@media (prefers-reduced-motion: reduce){ .hud .dot{animation:none} }
+</style>
+
+<script>document.documentElement.classList.add('js');</script>
+<canvas id="swarm" aria-hidden="true"></canvas>
+
+<aside class="hud" id="hud" aria-label="Live build status">
+  <div class="hud-top"><span><i class="dot"></i>NANO-01 live</span><time id="h-clock">--:--:--</time></div>
+  <div class="hud-row"><span>units</span><b id="h-swarm">0 / 0</b></div>
+  <div class="hud-row"><span>build</span><b id="h-build">0%</b></div>
+  <div class="bar"><i id="h-bar"></i></div>
+  <div class="hud-row"><span>now</span><b id="h-now">starting</b></div>
+  <div class="log" id="h-log"></div>
+  <div class="hud-btns">
+    <button type="button" id="h-speed">Speed 1×</button>
+    <button type="button" id="h-skip">Skip</button>
+    <button type="button" id="h-replay" hidden>Rebuild the site</button>
+  </div>
+</aside>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="kicker">Cybersecurity · Giza, Egypt</p>
+    <h1 class="name" data-piece="name" aria-label="Marwan Sharkawey"><span>Marwan </span><span>Sharkawey</span></h1>
+    <p class="roles"><span>SOC Analyst</span><i>/</i><span>Junior Penetration Tester</span><i>/</i><span>Cybersecurity Analyst</span></p>
+  </header>
+
+  <section class="sec is-queued" id="profile">
+    <div class="rail">profile<span class="st">queued</span></div>
+    <div class="body">
+      <div class="profile">
+        <div data-piece="summary">
+          <p class="lede">I am a Computer Science student focused on defensive and offensive security. I practice SOC investigations and web application testing hands-on, through PortSwigger Web Security Academy, CyberDefenders and HackerDNA labs, and I am looking for a SOC Analyst, Junior Penetration Tester or Cybersecurity Analyst role.</p>
+          <div class="links">
+            <a href="https://www.linkedin.com/in/marwansharkawey" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://github.com/MarwanSharkawey" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+        <dl data-piece="facts">
+          <div><dt>Studying</dt><dd>BSc Computer Science, Modern Academy for Computer Science, 2024 – 2028</dd></div>
+          <div><dt>Looking for</dt><dd>SOC Analyst, Junior Penetration Tester, Cybersecurity Analyst</dd></div>
+          <div><dt>Languages</dt><dd>Arabic (native), English (professional working), German (basic)</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec is-queued" id="skills">
+    <div class="rail">skills<span class="st">queued</span></div>
+    <div class="body">
+      <h2 data-piece="skills heading">What I work with</h2>
+      <div class="groups">
+        <div class="group" data-piece="security operations"><h3>Security operations</h3>
+          <ul class="chips"><li>SOC monitoring</li><li>Log analysis</li><li>Alert triage</li><li>Incident response</li><li>Threat detection</li><li>IOC analysis</li><li>Threat intelligence</li><li>Threat hunting</li></ul></div>
+        <div class="group" data-piece="penetration testing"><h3>Penetration testing</h3>
+          <ul class="chips"><li>Web app pentesting</li><li>Vulnerability assessment</li><li>Reconnaissance</li><li>Enumeration</li><li>Exploitation</li><li>Authentication testing</li><li>Access control testing</li><li>Input validation testing</li><li>OWASP Top 10</li></ul></div>
+        <div class="group" data-piece="web security"><h3>Web security</h3>
+          <ul class="chips"><li>SQL injection</li><li>XSS</li><li>CSRF</li><li>SSRF</li><li>XXE</li><li>Path traversal</li><li>Command injection</li><li>File upload</li><li>Business logic</li><li>API security</li></ul></div>
+        <div class="group" data-piece="network security"><h3>Network security</h3>
+          <ul class="chips"><li>TCP/IP</li><li>OSI model</li><li>DNS</li><li>DHCP</li><li>HTTP/HTTPS</li><li>Ports &amp; protocols</li><li>Packet analysis</li><li>VLANs</li><li>Routing</li><li>Switching</li></ul></div>
+        <div class="group" data-piece="digital forensics"><h3>Digital forensics</h3>
+          <ul class="chips"><li>Disk image analysis</li><li>Evidence analysis</li><li>Hash analysis</li><li>File system analysis</li><li>Incident investigation</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec is-queued" id="experience">
+    <div class="rail">experience<span class="st">queued</span></div>
+    <div class="body">
+      <h2 data-piece="experience heading">Hands-on experience</h2>
+      <article class="entry" data-piece="PortSwigger labs">
+        <h3>PortSwigger Web Security Academy</h3>
+        <p class="meta">Web security labs · Burp Suite</p>
+        <ul class="pts">
+          <li>Worked through labs on SQL injection, XSS, CSRF, SSRF, XXE, authentication, access control, path traversal, command injection, file upload and business logic flaws.</li>
+          <li>Used Burp Suite Proxy, Repeater, Intruder and Decoder to inspect and modify requests, cookies, sessions and headers.</li>
+          <li>Followed one method each time: reconnaissance, enumeration, exploitation, then validation.</li>
+        </ul>
+      </article>
+      <article class="entry" data-piece="CyberDefenders labs">
+        <h3>CyberDefenders</h3>
+        <p class="meta">Blue team and SOC labs</p>
+        <ul class="pts">
+          <li>Investigated incidents from logs, network traffic, forensic artifacts and indicators of compromise, and rebuilt incident timelines.</li>
+          <li>Covered threat hunting, incident response, digital forensics and malware analysis scenarios.</li>
+          <li>Used Wireshark, Splunk and Windows and Linux artifacts to correlate evidence.</li>
+        </ul>
+      </article>
+      <article class="entry" data-piece="HackerDNA labs">
+        <h3>HackerDNA</h3>
+        <p class="meta">Hands-on hacking labs · Very Easy, Easy and Medium levels</p>
+        <ul class="pts">
+          <li>Completed all of the free Very Easy, Easy and Medium labs on the platform.</li>
+          <li>Each lab was an end-to-end exercise: find the weakness, exploit it and capture the flag.</li>
+          <li>The platform's categories at these levels include web and API security, network and infrastructure, privilege escalation, digital forensics and cryptography.</li>
+        </ul>
+      </article>
+      <article class="entry" data-piece="SOC labs">
+        <h3>Cybersecurity and SOC labs</h3>
+        <p class="meta">Nmap · Splunk · FTK Imager · Feroxbuster · Shodan</p>
+        <ul class="pts">
+          <li>Ran network discovery, port scans and service enumeration with Nmap in controlled environments.</li>
+          <li>Practiced security monitoring and log analysis in Splunk.</li>
+          <li>Examined forensic disk images in FTK Imager, including evidence and hash analysis.</li>
+          <li>Used Feroxbuster for web content discovery and Shodan for asset reconnaissance.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec is-queued" id="projects">
+    <div class="rail">projects<span class="st">queued</span></div>
+    <div class="body">
+      <h2 data-piece="projects heading">Selected security projects</h2>
+      <article class="entry" data-piece="web app analysis">
+        <h3>Web Application Security Analysis</h3>
+        <p class="meta">Burp Suite · PortSwigger · OWASP · HTTP</p>
+        <ul class="pts">
+          <li>Ran structured vulnerability assessments against intentionally vulnerable web applications.</li>
+          <li>Intercepted and modified HTTP requests, and tested authentication, authorization, session management, input validation and business logic controls.</li>
+          <li>Documented each finding with technical evidence and a remediation recommendation.</li>
+        </ul>
+      </article>
+      <article class="entry" data-piece="network analysis">
+        <h3>Network Security and Traffic Analysis</h3>
+        <p class="meta">Wireshark · Nmap · Cisco Packet Tracer</p>
+        <ul class="pts">
+          <li>Designed network topologies in Cisco Packet Tracer and configured VLANs, trunk links, DHCP, EtherChannel, Port Security, PortFast and BPDU Guard.</li>
+          <li>Analyzed network protocols in Wireshark to spot suspicious traffic.</li>
+          <li>Used Nmap for controlled reconnaissance and service enumeration.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec is-queued" id="training">
+    <div class="rail">training<span class="st">queued</span></div>
+    <div class="body">
+      <h2 data-piece="training heading">Training and education</h2>
+      <div class="two">
+        <div data-piece="training list">
+          <p class="meta" style="margin-bottom:12px">Cybersecurity training</p>
+          <ul class="plain">
+            <li>SEC450, Blue Team / SOC Security Operations</li>
+            <li>SEC504, Hacker Tools, Techniques, and Incident Handling</li>
+            <li>eJPTv1 preparation</li>
+            <li>CompTIA Security+ fundamentals</li>
+            <li>Incident Response, Threat Intelligence, Digital Forensics</li>
+            <li>OT Cybersecurity Foundations</li>
+            <li>Sophos Firewall Engineer</li>
+            <li>CCNP Security SCOR preparation</li>
+          </ul>
+        </div>
+        <div data-piece="education">
+          <p class="meta" style="margin-bottom:12px">Education</p>
+          <h3 style="font:700 1.25rem/1.25 var(--font-display)">Bachelor of Computer Science</h3>
+          <p class="meta" style="margin:6px 0 14px">Modern Academy for Computer Science · 2024 – 2028</p>
+          <p style="margin:0;max-width:44ch">Coursework: Computer Networks, Cybersecurity, Data Structures and Algorithms, Database Systems, Operating Systems, Software Engineering.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec is-queued" id="toolbox">
+    <div class="rail">toolbox<span class="st">queued</span></div>
+    <div class="body">
+      <h2 data-piece="toolbox heading">Tools and languages</h2>
+      <div class="groups">
+        <div class="group" data-piece="security tools"><h3>Security tools</h3>
+          <ul class="chips"><li>Burp Suite</li><li>Nmap</li><li>Wireshark</li><li>Splunk</li><li>FTK Imager</li><li>Feroxbuster</li><li>Shodan</li><li>Kali Linux</li><li>Cisco Packet Tracer</li></ul></div>
+        <div class="group" data-piece="programming"><h3>Programming and scripting</h3>
+          <ul class="chips"><li>Python</li><li>Bash</li><li>JavaScript</li><li>PHP</li><li>SQL</li><li>C++</li><li>Java</li></ul></div>
+        <div class="group" data-piece="platforms"><h3>Platforms</h3>
+          <ul class="chips"><li>Linux</li><li>Windows</li><li>Git</li><li>GitHub</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Marwan Sharkawey · Giza, Egypt</span>
+    <span>This page is written live by a small team of nanobots on every load.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s);};
+var root=document.documentElement;
+
+function revealAll(){
+  root.classList.remove('js');
+  [].forEach.call(document.querySelectorAll('.sec'),function(sec){
+    sec.classList.remove('is-queued','is-building'); sec.classList.add('is-built');
+    var st=sec.querySelector('.st'); if(st) st.textContent='built';
+  });
+  var cv=$('#swarm'); if(cv) cv.style.display='none';
+  var hud=$('#hud'); if(hud) hud.hidden=true;
+}
+
+try{ main(); }catch(e){ console.error(e); revealAll(); }
+
+function main(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ revealAll(); return; }
+
+  var TAU=Math.PI*2;
+  var cv=$('#swarm'), ctx=cv.getContext('2d');
+  var hSwarm=$('#h-swarm'), hBuild=$('#h-build'), hBar=$('#h-bar'), hNow=$('#h-now'), hLog=$('#h-log'), hClock=$('#h-clock');
+  var hReplay=$('#h-replay'), hSpeed=$('#h-speed'), hSkip=$('#h-skip');
+
+  function countChars(el){
+    var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),n,t=0;
+    while((n=w.nextNode())) t+=n.nodeValue.replace(/\s+/g,' ').trim().length;
+    return t;
+  }
+  var items=[].map.call(document.querySelectorAll('[data-piece]'),function(el){
+    return {el:el,sec:el.closest('.sec'),name:el.getAttribute('data-piece'),done:false,
+      n:countChars(el),chars:null,wraps:null,idx:0,budget:0,cost:0.05,cps:100};
+  });
+  var totalChars=items.reduce(function(a,x){return a+x.n;},0);
+  var caret={x:0,y:0,h:16};
+
+  var W=0,H=0,DPR=1,NB=0,time=0,phase='intro',phaseT=0,merged=0,mergedAt=0,cur=0,stopped=false;
+  var sub='travel',subT=0,speed=1,followPause=0,scanOff=0;
+  var drones=[],logs=[];
+  var lead={x:0,y:0,vx:0,vy:0,r:5,s:0,pulse:0};
+  var C={bot:'#7db6e8',acc:'#ffa21f',fg:'#e7edf3'};
+
+  function readColors(){
+    var s=getComputedStyle(root);
+    C.bot=(s.getPropertyValue('--bot')||'').trim()||C.bot;
+    C.acc=(s.getPropertyValue('--accent')||'').trim()||C.acc;
+    C.fg=(s.getPropertyValue('--fg')||'').trim()||C.fg;
+  }
+  function resize(){
+    DPR=Math.min(window.devicePixelRatio||1,2);
+    W=cv.clientWidth; H=cv.clientHeight;
+    cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+  }
+  function rand(a,b){return a+Math.random()*(b-a);}
+  function ease(t){return 1-Math.pow(1-t,3);}
+  function setPhase(p){phase=p;phaseT=0;}
+
+  function log(msg){
+    var t=new Date().toLocaleTimeString('en-GB');
+    logs.push(t+'  '+msg); if(logs.length>4) logs.shift();
+    hLog.textContent='';
+    logs.forEach(function(l){var d=document.createElement('div');d.textContent=l;hLog.appendChild(d);});
+  }
+
+  function makeDrones(){
+    NB=W<700?8:12; drones=[];
+    for(var i=0;i<NB;i++){
+      drones.push({x:-60,y:-60,vx:0,vy:0,st:'wait',delay:0.4+i*(2.6/NB)+Math.random()*0.2,
+        ang:i*TAU/NB,dock:18+(i%2)*7,w:(i%2?1:-1)*rand(0.5,1),ph:Math.random()*TAU});
+    }
+  }
+  function edgePos(d){
+    var s=(Math.random()*4)|0, m=30;
+    if(s===0){d.x=Math.random()*W;d.y=-m;}
+    else if(s===1){d.x=W+m;d.y=Math.random()*H;}
+    else if(s===2){d.x=Math.random()*W;d.y=H+m;}
+    else{d.x=-m;d.y=Math.random()*H;}
+  }
+  function spring(o,tx,ty,k,c,dt){
+    o.vx+=((tx-o.x)*k-o.vx*c)*dt; o.vy+=((ty-o.y)*k-o.vy*c)*dt;
+    o.x+=o.vx*dt; o.y+=o.vy*dt;
+  }
+
+  function merge(d){
+    d.st='dock'; merged++; lead.pulse=1; lead.r=5+3*Math.min(1,merged/NB);
+    if(merged===1) log('first unit docked');
+    if(merged===NB){ log('all '+NB+' units merged'); mergedAt=phaseT; }
+  }
+  function stepIn(d,dt){
+    var dx=lead.x-d.x, dy=lead.y-d.y, dist=Math.hypot(dx,dy)||1, ux=dx/dist, uy=dy/dist;
+    var sp=210+Math.min(dist,600)*0.22+(1-Math.min(dist,300)/300)*120;
+    var curl=d.w*(dist>120?0.5:0.2);
+    var k=Math.min(1,3.5*dt);
+    d.vx+=((ux-uy*curl)*sp-d.vx)*k; d.vy+=((uy+ux*curl)*sp-d.vy)*k;
+    d.x+=d.vx*dt; d.y+=d.vy*dt;
+    if(dist<lead.r*lead.s+16) merge(d);
+  }
+  function orbit(d,dt,rad,k,c,rate){
+    d.ang+=d.w*dt*rate;
+    spring(d,lead.x+Math.cos(d.ang)*rad,lead.y+Math.sin(d.ang)*rad,k,c,dt);
+  }
+
+  function updateSecStatus(sec){
+    if(!sec) return;
+    var tot=0,dn=0;
+    items.forEach(function(x){ if(x.sec===sec){ tot++; if(x.done) dn++; } });
+    var st=sec.querySelector('.st');
+    if(dn>=tot){ sec.classList.remove('is-building','is-queued'); sec.classList.add('is-built'); st.textContent='built'; }
+    else st.textContent='part '+(dn+1)+' of '+tot;
+  }
+  function wrapPiece(it){
+    var walker=document.createTreeWalker(it.el,NodeFilter.SHOW_TEXT,null),nodes=[],nd;
+    while((nd=walker.nextNode())) nodes.push(nd);
+    it.wraps=[]; it.chars=[];
+    nodes.forEach(function(node){
+      var txt=node.nodeValue.replace(/\s+/g,' ').trim();
+      if(!txt) return;
+      var frag=document.createDocumentFragment(), spans=[];
+      for(var k=0;k<txt.length;k++){
+        var sp=document.createElement('span'); sp.className='ch'; sp.textContent=txt.charAt(k);
+        frag.appendChild(sp); spans.push(sp); it.chars.push(sp);
+      }
+      node.parentNode.replaceChild(frag,node);
+      it.wraps.push({orig:node,spans:spans});
+    });
+  }
+  function unwrapPiece(it){
+    if(!it.wraps) return;
+    it.wraps.forEach(function(w){
+      var first=w.spans[0];
+      if(first&&first.parentNode) first.parentNode.insertBefore(w.orig,first);
+      w.spans.forEach(function(sp){ if(sp.parentNode) sp.parentNode.removeChild(sp); });
+    });
+    it.wraps=null; it.chars=null;
+  }
+  function caretPos(it){
+    var n=it.chars?it.chars.length:0, r;
+    if(!n){ r=it.el.getBoundingClientRect(); return {x:r.left,y:r.top+10,h:16}; }
+    if(it.idx<n){ r=it.chars[it.idx].getBoundingClientRect(); return {x:r.left,y:r.top+r.height/2,h:r.height}; }
+    r=it.chars[n-1].getBoundingClientRect(); return {x:r.right,y:r.top+r.height/2,h:r.height};
+  }
+  function updateSecStatus(sec){
+    if(!sec) return;
+    var tot=0,dn=0;
+    items.forEach(function(x){ if(x.sec===sec){ tot++; if(x.done) dn++; } });
+    var st=sec.querySelector('.st');
+    if(dn>=tot){ sec.classList.remove('is-building','is-queued'); sec.classList.add('is-built'); st.textContent='built'; }
+    else st.textContent='part '+(dn+1)+' of '+tot;
+  }
+  function toBuild(){
+    setPhase('build'); cur=0;
+    drones.forEach(function(d){ if(d.st==='wait'){edgePos(d);} d.st='free'; });
+    startItem(0);
+  }
+  function startItem(i){
+    var it=items[i];
+    it.el.classList.remove('q');
+    wrapPiece(it);
+    it.idx=0; it.budget=0; it.cost=0.05;
+    it.cps=it.el.classList.contains('name')?9:(it.el.tagName==='H2'?26:100);
+    sub='travel'; subT=0;
+    if(it.sec){ it.sec.classList.remove('is-queued'); it.sec.classList.add('is-building'); updateSecStatus(it.sec); }
+    log('flying to '+it.name);
+  }
+  function finishItem(){
+    var it=items[cur];
+    unwrapPiece(it); it.done=true; it.el.classList.add('done');
+    lead.pulse=1; log('wrote '+it.name);
+    updateSecStatus(it.sec);
+    cur++;
+    if(cur>=items.length) toDone(); else startItem(cur);
+  }
+  function toDone(){
+    setPhase('done');
+    drones.forEach(function(d){ d.st='free'; });
+    log('build complete');
+    hReplay.hidden=false; hSpeed.hidden=true; hSkip.hidden=true;
+  }
+  function skipAll(){
+    items.forEach(function(it){
+      if(!it.done){ unwrapPiece(it); it.done=true; it.el.classList.remove('q'); it.el.classList.add('done'); }
+    });
+    items.forEach(function(it){ updateSecStatus(it.sec); });
+    lead.s=1; lead.r=8;
+    if(phase!=='done') toDone();
+    log('skipped to the end');
+  }
+
+  function update(dt){
+    time+=dt; phaseT+=dt;
+    lead.pulse=Math.max(0,lead.pulse-dt*2.2);
+    var i,d;
+    if(phase==='intro'){
+      lead.x=W/2; lead.y=H*0.46; lead.s=ease(Math.min(1,phaseT/0.9));
+      if(phaseT>1.3){ setPhase('gather'); log('nano-01 online'); }
+    }
+    else if(phase==='gather'){
+      lead.x=W/2+Math.sin(time*0.8)*14; lead.y=H*0.46+Math.cos(time*0.6)*10;
+      for(i=0;i<drones.length;i++){
+        d=drones[i];
+        if(d.st==='wait'){
+          if(phaseT>=d.delay){ edgePos(d); d.st='in'; d.vx=(lead.x-d.x)*0.25; d.vy=(lead.y-d.y)*0.25; }
+        } else if(d.st==='in') stepIn(d,dt);
+        else if(d.st==='dock') orbit(d,dt,d.dock,40,9,0.9);
+      }
+      if(merged>=NB){ if(phaseT-mergedAt>1.0) toBuild(); }
+      else if(phaseT>9) toBuild();
+    }
+    else if(phase==='build'){
+      var it=items[cur]; subT+=dt;
+      var cp=caretPos(it);
+      var camT=Math.max(0,cp.y+window.scrollY-H*0.45);
+      if(time>followPause) window.scrollTo(0,window.scrollY+(camT-window.scrollY)*Math.min(1,2.6*dt));
+      cp=caretPos(it);
+      caret.x=cp.x; caret.y=cp.y; caret.h=cp.h;
+      scanOff=cp.y<20?-1:(cp.y>H-40?1:0);
+      var ly=Math.max(30,Math.min(H-60,cp.y)), finished=false;
+      if(sub==='travel'){
+        var tx=cp.x+18, ty=ly+24;
+        spring(lead,tx,ty,7,4.2,dt);
+        if((Math.hypot(lead.x-tx,lead.y-ty)<40&&subT>0.7&&(time<followPause||Math.abs(camT-window.scrollY)<60))||subT>4){
+          sub='work'; subT=0; it.budget=0; log('writing '+it.name);
+        }
+      } else {
+        it.budget+=dt;
+        while(it.idx<it.chars.length&&it.budget>=it.cost){
+          it.budget-=it.cost;
+          var chEl=it.chars[it.idx]; chEl.classList.add('on'); it.idx++;
+          var cc=chEl.textContent;
+          it.cost=(0.55+0.9*Math.random())/it.cps+(cc==='.'?0.22:((cc===','||cc===':'||cc===';')?0.1:0));
+        }
+        spring(lead,cp.x+18,ly+24,26,9,dt);
+        if(it.idx>=it.chars.length&&it.budget>0.35) finished=true;
+      }
+      for(i=0;i<drones.length;i++) orbit(drones[i],dt,(sub==='work'?12:18)+(i%3)*7,12,5,1.4);
+      if(finished) finishItem();
+    }
+    else{
+      spring(lead,W-Math.max(64,W*0.06),H-72,3.5,2.8,dt);
+      for(i=0;i<drones.length;i++) orbit(drones[i],dt,16+(i%3)*7,6,3.4,0.8);
+    }
+  }
+
+  function hex(x,y,rad,rot){
+    ctx.beginPath();
+    for(var k=0;k<6;k++){
+      var a=rot+k*TAU/6, px=x+Math.cos(a)*rad, py=y+Math.sin(a)*rad;
+      if(k) ctx.lineTo(px,py); else ctx.moveTo(px,py);
+    }
+    ctx.closePath();
+  }
+
+  function draw(){
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,W,H);
+    var i,d,working=(phase==='build'&&sub==='work');
+    // blueprint frames for parts not built yet
+    if(phase==='gather'||phase==='build'){
+      ctx.lineWidth=1; ctx.setLineDash([4,5]);
+      for(i=0;i<items.length;i++){
+        var itm=items[i]; if(itm.done) continue;
+        var fr=itm.el.getBoundingClientRect();
+        if(fr.bottom<0||fr.top>H) continue;
+        var activeF=(phase==='build'&&i===cur);
+        ctx.strokeStyle=activeF?C.acc:C.fg; ctx.globalAlpha=activeF?0.8:0.14;
+        ctx.strokeRect(fr.left-6,fr.top-6,fr.width+12,fr.height+12);
+      }
+      ctx.setLineDash([]);
+    }
+    // tethers
+    ctx.lineWidth=1; ctx.beginPath();
+    for(i=0;i<drones.length;i++){
+      d=drones[i];
+      if(d.st==='dock'||d.st==='free'){ctx.moveTo(lead.x,lead.y);ctx.lineTo(d.x,d.y);}
+    }
+    ctx.strokeStyle=C.bot; ctx.globalAlpha=0.3; ctx.stroke();
+    if(phase==='gather'){
+      ctx.beginPath();
+      for(i=0;i<drones.length;i++){
+        d=drones[i];
+        if(d.st==='in'&&Math.hypot(d.x-lead.x,d.y-lead.y)<240){ctx.moveTo(d.x,d.y);ctx.lineTo(lead.x,lead.y);}
+      }
+      ctx.strokeStyle=C.acc; ctx.globalAlpha=0.22; ctx.stroke();
+    }
+    // caret and writing beam
+    if(working){
+      ctx.save();
+      ctx.strokeStyle=C.acc; ctx.fillStyle=C.acc; ctx.shadowColor=C.acc; ctx.shadowBlur=10;
+      ctx.globalAlpha=0.75; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(lead.x,lead.y); ctx.lineTo(caret.x,caret.y); ctx.stroke();
+      ctx.globalAlpha=1;
+      if(Math.sin(time*9)>-0.3) ctx.fillRect(caret.x-1,caret.y-caret.h*0.5,2,caret.h);
+      ctx.restore();
+    }
+    // drones
+    for(i=0;i<drones.length;i++){
+      d=drones[i]; if(d.st==='wait') continue;
+      var col=working?C.acc:C.bot;
+      var spd=Math.hypot(d.vx,d.vy);
+      if(spd>140){
+        ctx.strokeStyle=col; ctx.globalAlpha=0.35; ctx.lineWidth=1.2;
+        ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-d.vx*0.05,d.y-d.vy*0.05); ctx.stroke();
+      }
+      ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1.2; ctx.globalAlpha=0.75;
+      hex(d.x,d.y,5.4,time*0.8+d.ph); ctx.stroke();
+      ctx.globalAlpha=1; ctx.beginPath(); ctx.arc(d.x,d.y,2.2,0,TAU); ctx.fill();
+    }
+    // lead
+    if(lead.s>0.01){
+      var R=lead.r*lead.s;
+      if(lead.pulse>0){
+        ctx.globalAlpha=lead.pulse*0.55; ctx.strokeStyle=C.acc; ctx.lineWidth=1.2;
+        ctx.beginPath(); ctx.arc(lead.x,lead.y,R+8+(1-lead.pulse)*28,0,TAU); ctx.stroke();
+      }
+      ctx.globalAlpha=0.9; ctx.strokeStyle=C.acc; ctx.lineWidth=1.4;
+      hex(lead.x,lead.y,R+7*lead.s,time*0.5); ctx.stroke();
+      ctx.globalAlpha=1; ctx.fillStyle=C.acc; ctx.shadowColor=C.acc; ctx.shadowBlur=14;
+      ctx.beginPath(); ctx.arc(lead.x,lead.y,R,0,TAU); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.font='500 10.5px "IBM Plex Mono",monospace'; ctx.fillStyle=C.fg; ctx.globalAlpha=0.8;
+      var lx=lead.x+R+(phase==='done'?-70:22);
+      if(!working) ctx.fillText('NANO-01',phase==='done'?lead.x-R-68:lx,lead.y+4);
+      ctx.globalAlpha=1;
+    }
+  }
+
+  function hudUpdate(){
+    hClock.textContent=new Date().toLocaleTimeString('en-GB');
+    hSwarm.textContent=(phase==='intro'?0:(phase==='gather'?merged:NB))+' / '+NB;
+    var pct=0;
+    if(phase==='done') pct=100;
+    else if(phase==='build'){ var typed=0; items.forEach(function(x,ix){ if(x.done) typed+=x.n; else if(ix===cur) typed+=Math.min(x.idx,x.n); }); pct=Math.round(typed/totalChars*100); }
+    hBuild.textContent=pct+'%'; hBar.style.width=pct+'%';
+    var now='starting';
+    if(phase==='intro') now='waking up';
+    else if(phase==='gather') now='merging units';
+    else if(phase==='build') now=(sub==='travel'?'flying to ':'writing ')+items[cur].name+(scanOff<0?' ↑':(scanOff>0?' ↓':''));
+    else now='idle';
+    hNow.textContent=now;
+  }
+
+  function restart(){
+    items.forEach(function(it){
+      unwrapPiece(it); it.idx=0; it.done=false;
+      it.el.classList.remove('done'); it.el.classList.add('q');
+      if(it.sec){ it.sec.classList.remove('is-built','is-building'); it.sec.classList.add('is-queued'); it.sec.querySelector('.st').textContent='queued'; }
+    });
+    root.classList.add('js');
+    merged=0; mergedAt=0; cur=0; scanOff=0; sub='travel'; subT=0; logs=[]; hLog.textContent='';
+    lead.s=0; lead.r=5; lead.vx=0; lead.vy=0; lead.pulse=0;
+    hReplay.hidden=true; hSpeed.hidden=false; hSkip.hidden=false;
+    makeDrones(); setPhase('intro');
+    window.scrollTo(0,0);
+  }
+
+  window.addEventListener('resize',resize);
+  hReplay.addEventListener('click',restart);
+  hSkip.addEventListener('click',skipAll);
+  hSpeed.addEventListener('click',function(){
+    speed=speed===1?2:(speed===2?4:1); hSpeed.textContent='Speed '+speed+'×';
+  });
+  ['wheel','touchstart','keydown'].forEach(function(ev){
+    window.addEventListener(ev,function(){followPause=time+6;},{passive:true});
+  });
+
+  items.forEach(function(it){it.el.classList.add('q');});
+  resize(); readColors(); makeDrones(); hudUpdate();
+
+  var last=0,hudT=0,frames=0;
+  function frame(now){
+    if(stopped) return;
+    try{
+      var dt=last?Math.min(0.05,(now-last)/1000):0.016; last=now;
+      update(phase==='build'?Math.min(0.1,dt*speed):dt); draw();
+      hudT+=dt; if(hudT>0.1){hudT=0;hudUpdate();}
+      if(++frames%90===0) readColors();
+    }catch(e){ console.error(e); stopped=true; revealAll(); return; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+})();
+</script>
+
+</body></html>
